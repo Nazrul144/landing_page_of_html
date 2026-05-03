@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pearii — Perimenopause, Reimagined.</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Playfair Display (serif headings) + Manrope (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Manrope:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                        sans: ['Manrope', 'sans-serif'],
+                    },
+                    colors: {
+                        teal: { DEFAULT: '#1D6B5E', light: '#3D8B87', pale: '#EFF5F3' },
+                        featurebg: '#3a8a85',
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ── Smooth scroll ── */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        /* ── Fade-in on load ── */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(28px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.75s ease both;
+        }
+
+        .delay-1 {
+            animation-delay: 0.15s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.30s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.45s;
+        }
+
+        .delay-4 {
+            animation-delay: 0.60s;
+        }
+
+        .delay-5 {
+            animation-delay: 0.75s;
+        }
+
+        /* ── Store buttons ── */
+        .store-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #000;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: background 0.2s;
+            min-width: 148px;
+        }
+
+        .store-btn:hover {
+            background: #222;
+        }
+
+        .store-btn .top {
+            font-size: 10px;
+            opacity: 0.65;
+            display: block;
+            line-height: 1;
+        }
+
+        .store-btn .bottom {
+            font-size: 14px;
+            font-weight: 700;
+            display: block;
+            line-height: 1.3;
+        }
+
+        /* ── 3-D phone perspective wrapper ── */
+        .phones-stage {
+            perspective: 1400px;
+            perspective-origin: 50% 100%;
+        }
+
+        /* ── Teal divider ── */
+        .teal-bar {
+            width: 40px;
+            height: 3px;
+            background: #1D6B5E;
+            border-radius: 9999px;
+            margin: 4px 0 12px;
+        }
+
+        /* ── Scroll-reveal via IntersectionObserver ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ══════════════════════════════════════
+           CONTACT MODAL STYLES
+        ══════════════════════════════════════ */
+
+        /* Backdrop */
+        #contact-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.40);
+            backdrop-filter: blur(4px);
+            padding: 16px;
+        }
+
+        #contact-modal.open {
+            display: flex;
+        }
+
+        /* Modal card */
+        .modal-card {
+            position: relative;
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+            width: 100%;
+            max-width: 512px;
+            max-height: 92vh;
+            overflow-y: auto;
+        }
+
+        /* Teal header */
+        .modal-header {
+            background-color: #1D6B5E;
+            padding: 32px 32px 24px;
+            border-radius: 24px 24px 0 0;
+            position: relative;
+        }
+
+        @media (max-width: 480px) {
+            .modal-header { padding: 24px 24px 20px; }
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.20);
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            line-height: 1;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255,255,255,0.30);
+        }
+
+        .modal-eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #99d6cc;
+            margin-bottom: 4px;
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.4rem, 4vw, 1.85rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .modal-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.70);
+        }
+
+        /* Form body */
+        .modal-body {
+            padding: 28px 32px 32px;
+        }
+
+        @media (max-width: 480px) {
+            .modal-body { padding: 20px 24px 28px; }
+        }
+
+        /* Field wrapper */
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(29, 107, 94, 0.70);
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            background: #f0f7f6;
+            border: 1px solid #b2d8d8;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-family: 'Manrope', sans-serif;
+            color: #1D6B5E;
+            outline: none;
+            transition: box-shadow 0.2s, border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: rgba(29, 107, 94, 0.30);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            border-color: transparent;
+            box-shadow: 0 0 0 2px #1D6B5E;
+        }
+
+        .form-textarea {
+            resize: none;
+            min-height: 88px;
+        }
+
+        /* Error message */
+        .form-error {
+            font-size: 12px;
+            color: #ef4444;
+            margin-top: 2px;
+            display: none;
+        }
+
+        .form-error.visible {
+            display: block;
+        }
+
+        /* Name row */
+        .name-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Form stack */
+        .form-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Submit button */
+        .modal-submit-btn {
+            width: 100%;
+            background: #1D6B5E;
+            color: #fff;
+            font-family: 'Manrope', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 4px;
+        }
+
+        .modal-submit-btn:hover {
+            background: #155a4e;
+        }
+
+        .modal-submit-btn:disabled {
+            opacity: 0.60;
+            cursor: not-allowed;
+        }
+
+        /* Success state */
+        .modal-success {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 32px;
+            gap: 12px;
+            text-align: center;
+        }
+
+        .modal-success.visible {
+            display: flex;
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #eff5f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #1D6B5E;
+        }
+
+        .success-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1D6B5E;
+        }
+
+        .success-message {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .success-close-btn {
+            margin-top: 16px;
+            padding: 10px 28px;
+            background: #1D6B5E;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .success-close-btn:hover {
+            background: #155a4e;
+        }
+    </style>
+</head>
+
+<body class="bg-white overflow-x-hidden">
+
+    <!-- ═══════════════════════════════════════════════
+     SECTION 1 — HERO
+═══════════════════════════════════════════════ -->
+    <section class="w-full min-h-screen flex items-center" style="background-color:#1D6B5E;">
+        <div class="w-full max-w-6xl mx-auto px-8 sm:px-12 lg:px-20 py-20
+              flex flex-col lg:flex-row items-center justify-between gap-14">
+
+            <!-- Left: text -->
+            <div class="flex flex-col items-start gap-5 text-white flex-1">
+
+                <!-- Brand -->
+                <span class="text-2xl font-bold font-serif tracking-wide fade-up">Pearii</span>
+
+                <!-- Heading -->
+                <h1 class="text-5xl sm:text-6xl lg:text-[4.2rem] font-serif font-bold leading-[1.06] fade-up delay-1">
+                    Perimenopause,<br>Reimagined.
+                </h1>
+
+                <!-- Tagline -->
+                <p class="text-base sm:text-lg font-semibold fade-up delay-2">Your body. Your pace.</p>
+
+                <!-- Description -->
+                <p class="text-sm sm:text-base text-white/80 max-w-sm leading-relaxed fade-up delay-3">
+                    Navigate perimenopause with confidence through<br>personalized tracking and insights.
+                </p>
+
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 mt-1 fade-up delay-4">
+                    <!-- App Store -->
+                    <a href="https://apps.apple.com" target="_blank" class="store-btn">
+                        <!-- Apple icon -->
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="shrink-0">
+                            <path
+                                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                        </svg>
+                        <span>
+                            <span class="top">Download on the</span>
+                            <span class="bottom">App Store</span>
+                        </span>
+                    </a>
+
+                    <!-- Google Play -->
+                    <a href="https://play.google.com" target="_blank" class="store-btn">
+                        <!-- Play icon -->
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="shrink-0">
+                            <path
+                                d="M3 20.5v-17c0-.83 1-.97 1.45-.5l14 8.5c.39.24.39.82 0 1.06L4.45 21c-.45.47-1.45.33-1.45-.5z" />
+                        </svg>
+                        <span>
+                            <span class="top">GET IT ON</span>
+                            <span class="bottom">Google Play</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: hero image card -->
+            <div class="shrink-0 fade-up delay-5">
+                <div style="width:clamp(240px,32vw,360px); height:clamp(280px,38vw,430px);
+                  border-radius:22px; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,0.35);">
+                    <img src="images/hero.png" alt="Woman meditating at sunset"
+                        style="width:100%;height:100%;object-fit:cover;object-position:center;" />
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════════
+     SECTION 2 — FEATURE TEASER
+═══════════════════════════════════════════════ -->
+    <section class="w-full" style="background-color:#EFF5F3;">
+        <div class="max-w-6xl mx-auto px-8 sm:px-12 lg:px-20 py-20 sm:py-24
+              flex flex-col lg:flex-row items-center justify-between gap-14">
+
+            <!-- Left: text -->
+            <div class="flex-1 flex flex-col gap-6 reveal">
+                <h2 class="text-4xl sm:text-5xl lg:text-[3.4rem] font-serif font-bold text-[#1D6B5E] leading-tight">
+                    Make the Invisible, Visible.
+                </h2>
+                <p class="text-sm sm:text-base text-neutral-600 max-w-lg leading-relaxed">
+                    Sync your daily habits with your internal shifts. By tracking your
+                    supplements alongside your symptoms, Pearii helps you identify the
+                    "Lightbulb Moments"—the patterns that reveal what's working and
+                    what isn't. Transition from "detective work" to data-driven confidence.
+                </p>
+                <!-- Teal divider -->
+                <div class="teal-bar ml-52"></div>
+            </div>
+
+            <!-- Right: phone mockup -->
+            <div class="shrink-0 reveal" style="animation-delay:0.2s;">
+                <img src="images/iPhone.png" alt="Pearii app tracking charts" style="width:clamp(220px,28vw,200px); object-fit:contain;
+                  filter:drop-shadow(0 20px 40px rgba(0,0,0,0.18));" />
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════════
+     SECTION 3 — FEATURES + PHONES
+═══════════════════════════════════════════════ -->
+    <section class="w-full overflow-hidden" style="background-color:#3D8B87;">
+
+        <!-- Feature cards -->
+        <div class="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 pt-16 sm:pt-20 md:pt-24">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+                <!-- Card 1 -->
+                <div class="bg-white rounded-2xl p-8 flex flex-col gap-3 reveal">
+                    <p class="text-[11px] font-semibold tracking-widest uppercase" style="color:#3D8B87;">PERSONALIZED.
+                    </p>
+                    <h3 class="text-[1.45rem] font-serif font-bold leading-snug text-neutral-800">
+                        AI Support, Not Medical Advice.
+                    </h3>
+                    <div class="teal-bar"></div>
+                    <p class="text-sm text-neutral-500 leading-relaxed">
+                        Meet your Pearii companion. A 24/7 space to vent, explore symptoms,
+                        and find clarity. It's the judgment-free conversation you've been
+                        looking for—designed to support your mental well-being, not replace
+                        your doctor.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white rounded-2xl p-8 flex flex-col gap-3 reveal" style="transition-delay:0.15s;">
+                    <p class="text-[11px] font-semibold tracking-widest uppercase" style="color:#3D8B87;">INTEGRATED.
+                    </p>
+                    <h3 class="text-[1.45rem] font-serif font-bold leading-snug text-neutral-800">
+                        Symptom &amp; Supplement Tracking.
+                    </h3>
+                    <div class="teal-bar"></div>
+                    <p class="text-sm text-neutral-500 leading-relaxed">
+                        Stop guessing. Track your hot flashes, mood shifts, and more alongside
+                        your supplement protocol. Watch patterns emerge as your data starts to
+                        tell a clearer story.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white rounded-2xl p-8 flex flex-col gap-3 reveal" style="transition-delay:0.30s;">
+                    <p class="text-[11px] font-semibold tracking-widest uppercase" style="color:#3D8B87;">CURATED.</p>
+                    <h3 class="text-[1.45rem] font-serif font-bold leading-snug text-neutral-800">
+                        Workouts, Recipes &amp; Content.
+                    </h3>
+                    <div class="teal-bar"></div>
+                    <p class="text-sm text-neutral-500 leading-relaxed">
+                        No more generic wellness. Workouts designed for this phase. Recipes
+                        that fuel your body. Content that helps you understand what's going
+                        on—without overwhelm.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3-D Phone mockups -->
+        <div class="relative flex items-end justify-center mt-14" style="height:clamp(380px,52vw,620px);
+            perspective:2000px;
+            perspective-origin:50% 85%;">
+
+            <!-- LEFT phone -->
+            <div class="absolute z-10" style="
+    width: clamp(140px,19vw,245px);
+    bottom: 0;
+    left: 50%;
+    transform-origin: bottom center;
+    transform: translateX(-185%) translateY(3%) rotateY(22deg) rotateZ(7deg);
+  ">
+                <div style="
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9/19.5;
+      border-radius: clamp(1.4rem,2.4vw,2.2rem);
+      overflow: hidden;
+    ">
+                    <img src="images/3.png" alt="Recipes screen" style="width:90%;height:90%;object-fit:cover;" />
+                </div>
+            </div>
+
+            <!-- CENTER phone — upright, tallest, front -->
+            <div class="absolute z-20" style="
+    width: clamp(155px,21vw,265px);
+    bottom: 0;
+    left: 50%;
+    transform-origin: bottom center;
+    transform: translateX(-50%) rotateY(0deg) rotateZ(0deg);
+  ">
+                <div style="
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9/19.5;
+      border-radius: clamp(1.4rem,2.4vw,2.2rem);
+      overflow: hidden;
+
+    ">
+                    <img src="images/1.png" alt="AI chat screen" style="width:90%;height:90%;object-fit:cover;" />
+                </div>
+            </div>
+
+            <!-- RIGHT phone -->
+            <div class="absolute z-10" style="
+    width: clamp(140px,19vw,245px);
+    bottom: 0;
+    left: 50%;
+    transform-origin: bottom center;
+    transform: translateX(55%) translateY(3%) rotateY(-22deg) rotateZ(6deg);
+  ">
+                <div style="
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9/19.5;
+      border-radius: clamp(1.4rem,2.4vw,2.2rem);
+      overflow: hidden;
+    ">
+                    <img src="images/2.png" alt="Workouts screen" style="width:90%;height:90%;object-fit:cover;" />
+                </div>
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════════
+     SECTION 4 — CTA / CLOSING
+═══════════════════════════════════════════════ -->
+    <section class="w-full text-white text-center px-6 py-24 sm:py-28" style="background-color:#1F4F4F;">
+        <div class="max-w-2xl mx-auto flex flex-col items-center gap-6 reveal">
+
+            <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold leading-tight">
+                Your Next Chapter<br>Starts Here.
+            </h2>
+
+            <p class="text-base font-semibold text-white/90">
+                Your body is telling a story. Pearii helps you read it.
+            </p>
+
+            <p class="text-sm text-white/70">
+                Welcome to a New Way to Navigate Perimenopause.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-3 mt-2">
+                <!-- App Store -->
+                <a href="https://apps.apple.com" target="_blank" class="store-btn">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" class="shrink-0">
+                        <path
+                            d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                    </svg>
+                    <span>
+                        <span class="top">Download on the</span>
+                        <span class="bottom">App Store</span>
+                    </span>
+                </a>
+
+                <!-- Google Play -->
+                <a href="https://play.google.com" target="_blank" class="store-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="shrink-0">
+                        <path
+                            d="M3 20.5v-17c0-.83 1-.97 1.45-.5l14 8.5c.39.24.39.82 0 1.06L4.45 21c-.45.47-1.45.33-1.45-.5z" />
+                    </svg>
+                    <span>
+                        <span class="top">GET IT ON</span>
+                        <span class="bottom">Google Play</span>
+                    </span>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+    <footer style="background-color:#1F4F4F;" class="w-full px-8 sm:px-12 lg:px-20 pt-8 pb-6">
+        <div class="max-w-7xl mx-auto flex flex-col gap-8">
+
+            <!-- Top row: copyright + nav links -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-12">
+                <p class="text-xs" style="color:rgba(255,255,255,0.6);">
+                    © 2026 Pearii Inc. All rights reserved.
+                </p>
+                <nav class="flex gap-6">
+                    <a href="privacy-policy.html" class="text-xs transition-colors" style="color:rgba(255,255,255,0.6);"
+                        onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">
+                        Privacy Policy
+                    </a>
+                    <a href="terms.html" class="text-xs transition-colors" style="color:rgba(255,255,255,0.6);"
+                        onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">
+                        Terms of Service
+                    </a>
+                    <!-- ↓ Only change: added id + href="#" to trigger modal -->
+                    <a href="#" id="open-contact-modal" class="text-xs transition-colors" style="color:rgba(255,255,255,0.6);"
+                        onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">
+                        Contact
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Bottom row: disclaimer centered -->
+            <p class="text-center text-xs" style="color:rgba(255,255,255,0.45);">
+                Pearii is a wellness tool and does not provide medical advice.
+                Consult with a healthcare professional for medical concerns.
+            </p>
+
+        </div>
+    </footer>
+
+
+    <!-- ═══════════════════════════════════════════════
+     CONTACT MODAL
+═══════════════════════════════════════════════ -->
+    <div id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+        <!-- Modal card — stop click propagation so backdrop click closes but card click doesn't -->
+        <div class="modal-card" id="modal-card">
+
+            <!-- Teal header -->
+            <div class="modal-header">
+                <button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">✕</button>
+                <p class="modal-eyebrow">Get in Touch</p>
+                <h2 class="modal-title" id="modal-title">We'd love to<br>hear from you.</h2>
+                <p class="modal-subtitle">Fill out the form and we'll get back to you shortly.</p>
+            </div>
+
+            <!-- Form body -->
+            <div class="modal-body">
+
+                <!-- Success state (hidden by default) -->
+                <div class="modal-success" id="modal-success">
+                    <div class="success-icon">✓</div>
+                    <p class="success-title">Message Sent!</p>
+                    <p class="success-message">Thank you for reaching out. We'll be in touch soon.</p>
+                    <button class="success-close-btn" id="success-close-btn">Close</button>
+                </div>
+
+                <!-- Form (shown by default) -->
+                <form id="contact-form" novalidate>
+                    <div class="form-stack">
+
+                        <!-- First + Last name row -->
+                        <div class="name-row">
+                            <div class="form-field">
+                                <label class="form-label" for="firstName">First Name</label>
+                                <input class="form-input" type="text" id="firstName" name="firstName" placeholder="Jane" />
+                                <span class="form-error" id="firstName-error">First name is required</span>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="lastName">Last Name</label>
+                                <input class="form-input" type="text" id="lastName" name="lastName" placeholder="Doe" />
+                                <span class="form-error" id="lastName-error">Last name is required</span>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-field">
+                            <label class="form-label" for="email">Email</label>
+                            <input class="form-input" type="email" id="email" name="email" placeholder="jane@example.com" />
+                            <span class="form-error" id="email-error">Please enter a valid email</span>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="form-field">
+                            <label class="form-label" for="message">Message</label>
+                            <textarea class="form-textarea" id="message" name="message" rows="3" placeholder="How can we help you?"></textarea>
+                            <span class="form-error" id="message-error">Message must be at least 10 characters</span>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="modal-submit-btn" id="modal-submit-btn">
+                            Send Message →
+                        </button>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════════
+     SCROLL REVEAL SCRIPT
+═══════════════════════════════════════════════ -->
+    <script>
+        const revealEls = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        revealEls.forEach(el => observer.observe(el));
+    </script>
+
+
+    <!-- ═══════════════════════════════════════════════
+     CONTACT MODAL SCRIPT
+═══════════════════════════════════════════════ -->
+    <script>
+        (function () {
+            const modal        = document.getElementById('contact-modal');
+            const modalCard    = document.getElementById('modal-card');
+            const openBtn      = document.getElementById('open-contact-modal');
+            const closeBtn     = document.getElementById('modal-close-btn');
+            const successDiv   = document.getElementById('modal-success');
+            const successClose = document.getElementById('success-close-btn');
+            const form         = document.getElementById('contact-form');
+            const submitBtn    = document.getElementById('modal-submit-btn');
+
+            // ── Open / Close helpers ──
+            function openModal() {
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+                // Reset to form view when reopened
+                showForm();
+            }
+
+            function closeModal() {
+                modal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            function showForm() {
+                form.style.display = '';
+                successDiv.classList.remove('visible');
+                form.reset();
+                clearErrors();
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message →';
+            }
+
+            function showSuccess() {
+                form.style.display = 'none';
+                successDiv.classList.add('visible');
+            }
+
+            // ── Trigger ──
+            openBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                openModal();
+            });
+
+            closeBtn.addEventListener('click', closeModal);
+            successClose.addEventListener('click', closeModal);
+
+            // Backdrop click closes
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeModal();
+            });
+
+            // ESC key closes
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+            });
+
+            // ── Validation ──
+            function clearErrors() {
+                document.querySelectorAll('.form-error').forEach(el => el.classList.remove('visible'));
+                document.querySelectorAll('.form-input, .form-textarea').forEach(el => {
+                    el.style.boxShadow = '';
+                    el.style.borderColor = '';
+                });
+            }
+
+            function showError(fieldId, show) {
+                const errEl = document.getElementById(fieldId + '-error');
+                const inputEl = document.getElementById(fieldId);
+                if (show) {
+                    errEl.classList.add('visible');
+                    inputEl.style.boxShadow = '0 0 0 2px #ef4444';
+                    inputEl.style.borderColor = 'transparent';
+                } else {
+                    errEl.classList.remove('visible');
+                    inputEl.style.boxShadow = '';
+                    inputEl.style.borderColor = '';
+                }
+            }
+
+            function validateEmail(val) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+            }
+
+            function validate() {
+                const firstName = document.getElementById('firstName').value.trim();
+                const lastName  = document.getElementById('lastName').value.trim();
+                const email     = document.getElementById('email').value.trim();
+                const message   = document.getElementById('message').value.trim();
+                let valid = true;
+
+                showError('firstName', !firstName);   if (!firstName) valid = false;
+                showError('lastName',  !lastName);    if (!lastName)  valid = false;
+                showError('email',     !validateEmail(email)); if (!validateEmail(email)) valid = false;
+                showError('message',   message.length < 10);  if (message.length < 10)   valid = false;
+
+                return valid;
+            }
+
+            // ── Submit ──
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                clearErrors();
+
+                if (!validate()) return;
+
+                // Simulate submission
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+
+                setTimeout(function () {
+                    const data = {
+                        firstName: document.getElementById('firstName').value.trim(),
+                        lastName:  document.getElementById('lastName').value.trim(),
+                        email:     document.getElementById('email').value.trim(),
+                        message:   document.getElementById('message').value.trim(),
+                    };
+                    console.log('Contact form submitted:', data);
+                    showSuccess();
+                }, 800);
+            });
+        })();
+    </script>
+
+</body>
+
+</html>
